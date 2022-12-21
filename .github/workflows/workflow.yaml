@@ -1,11 +1,12 @@
 name: Test Workflow
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
-        message:
-          required: true
-          type: string
+      message:
+        type: string
+        description: 'Origin Channel'
+        required: true
 
 jobs:
   tests:
