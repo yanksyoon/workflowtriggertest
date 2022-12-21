@@ -5,7 +5,7 @@ on:
     inputs:
       message:
         type: string
-        description: 'Origin Channel'
+        description: 'echo message'
         required: true
 
 jobs:
