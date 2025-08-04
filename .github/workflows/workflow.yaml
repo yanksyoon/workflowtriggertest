@@ -1,16 +1,15 @@
 name: Test Workflow
 
 on:
-  workflow_dispatch:
-    inputs:
-      message:
-        type: string
-        description: 'echo message'
-        required: true
+  push:
+    branches:
+    - releases/**
 
 jobs:
-  tests:
+  test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - run: echo '${{ inputs.message }}'
+    - name: echo
+      run: |
+        echo "hello"
