@@ -2,13 +2,16 @@ name: Test Workflow
 
 on:
   push:
-    branches:
-    - releases/**
-  create:
+    # branches:
+    # - releases/**
+  workflow_run:
+    workflows: [Create branch Workflow]
+    types:
+      - completed
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
 
     steps:
     - name: echo
