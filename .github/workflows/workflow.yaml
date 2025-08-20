@@ -2,18 +2,12 @@ name: Test Workflow
 
 on:
   push:
-    # branches:
-    # - releases/**
-  workflow_run:
-    workflows: [Create branch Workflow]
-    types:
-      - completed
+
 
 jobs:
   test:
     runs-on: [self-hosted]
 
     steps:
-    - name: echo
-      run: |
-        echo "hello"
+    - uses: actions/checkout@v5
+
