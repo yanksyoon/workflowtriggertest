@@ -1,16 +1,47 @@
 name: Test Workflow
 
 on:
-  push:
+  workflow_dispatch:
 
 
 jobs:
   test:
-    runs-on: [self-hosted]
+    runs-on: [ubuntu-latest]
 
     steps:
-    - name: echo arch
-      run: dpkg --print-architecture
-    - uses: actions/checkout@v5
-    - uses: actions/checkout@v4
-    - uses: actions/checkout@v3
+    - name: Checkout your repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Set up Git identity
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+    - name: Get commits
+      id: get-commits
+      run: |
+        # Get latest commit
+        LATEST_COMMIT=$(git rev-parse HEAD)
+        echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_OUTPUT
+        echo "LATEST_COMMIT_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        
+        # Get previous processed commit
+        if [ -f ../patches/last_processed_commit.txt ]; then
+          PREVIOUS_COMMIT=$(cat ../patches/last_processed_commit.txt)
+          PREVIOUS_COMMIT_SHORT="${PREVIOUS_COMMIT:0:7}"
+          echo "PREVIOUS_COMMIT=$PREVIOUS_COMMIT" >> $GITHUB_OUTPUT
+          echo "PREVIOUS_COMMIT_SHORT=$PREVIOUS_COMMIT_SHORT" >> $GITHUB_OUTPUT
+        else
+          echo "PREVIOUS_COMMIT=" >> $GITHUB_OUTPUT
+          echo "PREVIOUS_COMMIT_SHORT=" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create pull request
+      uses: canonical/create-pull-request@main
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "test-patch"
+        branch-name: patch-sync/${{ steps.get-commits.outputs.LATEST_COMMIT_SHORT }}
+        title: Sync main patch ${{ steps.get-commits.outputs.LATEST_COMMIT_SHORT }}
+        body: Sync main branch patcdh for commit ${{ steps.get-commits.outputs.LATEST_COMMIT_SHORT }}
