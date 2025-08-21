@@ -44,7 +44,7 @@ jobs:
     - name: Create pull request
       uses: canonical/create-pull-request@main
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.PAT }}
         commit-message: "test-patch"
         branch-name: patch-sync/${{ steps.get-commits.outputs.LATEST_COMMIT_SHORT }}
         title: Sync main patch ${{ steps.get-commits.outputs.LATEST_COMMIT_SHORT }}
