@@ -3,7 +3,6 @@ name: Test Workflow
 on:
   workflow_dispatch:
 
-
 jobs:
   test:
     runs-on: [ubuntu-latest]
@@ -36,6 +35,10 @@ jobs:
           echo "PREVIOUS_COMMIT=" >> $GITHUB_OUTPUT
           echo "PREVIOUS_COMMIT_SHORT=" >> $GITHUB_OUTPUT
         fi
+
+    - name: Create dummy commit for PR
+      run: |
+        < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c10 | xargs -0 touch
 
     - name: Create pull request
       uses: canonical/create-pull-request@main
