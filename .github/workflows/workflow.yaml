@@ -59,7 +59,7 @@ jobs:
         token: ${{ secrets.PAT }}
         commit-message: "chore: update charm libraries"
         committer: yangsoo.yoon@canonical.com 
-        author: YangSoo Yoon
+        author: YangSoo Yoon <yangsoo.yoon@canonical.com>
         title: "chore: update charm libraries"
         body: |
           Automated action to fetch the latest minor and major versions of all charm libraries used by this charm. The branch of this PR 
