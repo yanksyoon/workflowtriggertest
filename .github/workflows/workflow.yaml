@@ -53,11 +53,19 @@ jobs:
         git_user_signingkey: true
         git_commit_gpgsign: true
 
-    - name: Create pull request
-      uses: canonical/create-pull-request@main
+    - name: Create a PR for local changes
+      uses: peter-evans/create-pull-request@v6
       with:
-        github-token: ${{ secrets.PAT }}
-        commit-message: "test-patch"
-        branch-name: patch-sync/${{ steps.get-commits.outputs.LATEST_COMMIT_SHORT }}
-        title: Sync main patch ${{ steps.get-commits.outputs.LATEST_COMMIT_SHORT }}
-        body: Sync main branch patcdh for commit ${{ steps.get-commits.outputs.LATEST_COMMIT_SHORT }}
+        token: ${{ secrets.PAT }}
+        commit-message: "chore: update charm libraries"
+        # committer: "${{ inputs.commit-username }} <${{ inputs.commit-email }}>"
+        # author: "${{ inputs.commit-username }} <${{ inputs.commit-email }}>"
+        title: "chore: update charm libraries"
+        body: |
+          Automated action to fetch the latest minor and major versions of all charm libraries used by this charm. The branch of this PR 
+          will be overwritten during the next check. Unless you really know what you're doing, you 
+          most likely don't want to push any commits to this branch.
+
+          The PR will be auto-merged if the CI is green, on the next iteration of the workflow.
+        branch: "test"
+        delete-branch: true
