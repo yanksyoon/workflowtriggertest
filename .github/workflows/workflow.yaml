@@ -58,7 +58,7 @@ jobs:
       with:
         token: ${{ secrets.PAT }}
         commit-message: "chore: update charm libraries"
-        committer: yangsoo.yoon@canonical.com 
+        committer: YangSoo Yoon <yangsoo.yoon@canonical.com>
         author: YangSoo Yoon <yangsoo.yoon@canonical.com>
         title: "chore: update charm libraries"
         body: |
