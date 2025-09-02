@@ -22,7 +22,15 @@
     "customDatasources": {
         "jenkins": {
             "defaultRegistryUrlTemplate": "https://www.jenkins.io/changelog-stable/",
-            "transformTemplates": []
+            "format": "html"
         }
-    }
+    },
+    "packageRules": [
+        {
+            "matchDatasources": [
+                "custom.jenkins"
+            ],
+            "extractVersion": "/changelog\/(?<version>.+)\/$"
+        }
+    ]
 }
