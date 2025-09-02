@@ -9,7 +9,7 @@
         {
             "customType": "regex",
             "managerFilePatterns": [
-                "(^|/)rockcraft\\.yaml$"
+                "/(^|/)rockcraft\\.yaml$/"
             ],
             "matchStrings": [
                 "JENKINS_VERSION: (?<currentValue>\\S+)"
