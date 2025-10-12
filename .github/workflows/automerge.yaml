@@ -1,0 +1,51 @@
+name: Auto Merge Pull Requests
+
+on:
+    schedule:
+        # Run at 9 AM and 9 PM UTC (adjust timezone as needed)
+        - cron: "0 9,21 * * *"
+    # Optional: Allow manual triggering for testing
+    workflow_dispatch:
+
+jobs:
+    auto-merge:
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+            contents: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Get open pull requests
+              id: get-prs
+              run: |
+                  # Get all open PRs
+                  PRS=$(gh pr list --state open --json number,title,mergeable,state --jq '.[] | select(.mergeable == "MERGEABLE") | .number')
+
+                  if [ -z "$PRS" ]; then
+                    echo "No mergeable pull requests found."
+                    echo "mergeable_prs=" >> $GITHUB_OUTPUT
+                  else
+                    echo "Found mergeable PRs: $PRS"
+                    echo "mergeable_prs=$PRS" >> $GITHUB_OUTPUT
+                  fi
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Merge pull requests
+              if: steps.get-prs.outputs.mergeable_prs != ''
+              run: |
+                  echo "Merging pull requests..."
+                  PRS="${{ steps.get-prs.outputs.mergeable_prs }}"
+
+                  # Convert to array and iterate
+                  echo "$PRS" | tr ' ' '\n' | while read pr_number; do
+                    if [ -n "$pr_number" ]; then
+                      echo "Merging PR #$pr_number"
+                      gh pr merge "$pr_number" --merge --delete-branch
+                    fi
+                  done
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
