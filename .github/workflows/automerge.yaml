@@ -1,4 +1,4 @@
-name: Auto Merge Pull Requests
+name: Auto Merge Oldest Pull Request
 
 on:
     schedule:
@@ -17,37 +17,33 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Get open pull requests
-              id: get-prs
+            - name: Merge oldest mergeable pull request
               run: |
-                  # Get all open PRs that are mergeable
-                  PRS=$(gh pr list --state open --json number --jq '.[] | select(.mergeable == "MERGEABLE") | .number')
+                  echo "Looking for the oldest mergeable PR..."
 
-                  if [ -z "$PRS" ]; then
-                    echo "No mergeable pull requests found."
-                    echo "mergeable_prs=" >> $GITHUB_OUTPUT
-                  else
-                    echo "Found mergeable PRs: $PRS"
-                    # Convert newlines to commas for safe output handling
-                    PR_LIST=$(echo "$PRS" | tr '\n' ',' | sed 's/,$//')
-                    echo "mergeable_prs=$PR_LIST" >> $GITHUB_OUTPUT
+                  # Get the oldest mergeable PR (sorted by creation date, ascending)
+                  # --json number,createdAt --jq sorts by createdAt and gets the first number
+                  PR_NUMBER=$(gh pr list --state open --json number,createdAt --jq 'sort_by(.createdAt) | .[] | select(.mergeable == "MERGEABLE") | .number' | head -n 1)
+
+                  if [ -z "$PR_NUMBER" ]; then
+                    echo "No mergeable PRs found."
+                    exit 0
                   fi
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Merge pull requests
-              if: steps.get-prs.outputs.mergeable_prs != ''
-              run: |
-                  echo "Merging pull requests..."
-                  PR_LIST="${{ steps.get-prs.outputs.mergeable_prs }}"
+                  echo "Found oldest mergeable PR #$PR_NUMBER"
 
-                  # Convert comma-separated list back to array and iterate
-                  IFS=',' read -ra PR_ARRAY <<< "$PR_LIST"
-                  for pr_number in "${PR_ARRAY[@]}"; do
-                    if [ -n "$pr_number" ]; then
-                      echo "Merging PR #$pr_number"
-                      gh pr merge "$pr_number" --merge --delete-branch
+                  # Final mergeability check right before merging
+                  MERGEABLE=$(gh pr view "$PR_NUMBER" --json mergeable --jq '.mergeable')
+                  if [ "$MERGEABLE" = "MERGEABLE" ]; then
+                    echo "Merging oldest PR #$PR_NUMBER..."
+                    if gh pr merge "$PR_NUMBER" --merge --delete-branch; then
+                      echo "✅ Successfully merged PR #$PR_NUMBER"
+                    else
+                      echo "❌ Failed to merge PR #$PR_NUMBER"
+                      exit 1
                     fi
-                  done
+                  else
+                    echo "PR #$PR_NUMBER is no longer mergeable (status: $MERGEABLE)"
+                  fi
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
