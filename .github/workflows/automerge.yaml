@@ -23,7 +23,7 @@ jobs:
 
                   # Get the oldest mergeable PR (sorted by creation date, ascending)
                   # --json number,createdAt --jq sorts by createdAt and gets the first number
-                  PR_NUMBER=$(gh pr list --state open --json number,createdAt --jq 'sort_by(.createdAt) | .[] | select(.mergeable == "MERGEABLE") | .number' | head -n 1)
+                  PR_NUMBER=$(gh pr list --state open --json number,createdAt,mergeable --jq 'sort_by(.createdAt) | .[] | select(.mergeable == "MERGEABLE") | .number' | head -n 1)
 
                   if [ -z "$PR_NUMBER" ]; then
                     echo "No mergeable PRs found."
