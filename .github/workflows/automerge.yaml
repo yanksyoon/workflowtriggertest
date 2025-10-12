@@ -2,9 +2,8 @@ name: Auto Merge Pull Requests
 
 on:
     schedule:
-        # Run at 9 AM and 9 PM UTC (adjust timezone as needed)
+        # Run at 9 AM and 9 PM UTC
         - cron: "0 9,21 * * *"
-    # Optional: Allow manual triggering for testing
     workflow_dispatch:
 
 jobs:
@@ -21,15 +20,17 @@ jobs:
             - name: Get open pull requests
               id: get-prs
               run: |
-                  # Get all open PRs
-                  PRS=$(gh pr list --state open --json number,title,mergeable,state --jq '.[] | select(.mergeable == "MERGEABLE") | .number')
+                  # Get all open PRs that are mergeable
+                  PRS=$(gh pr list --state open --json number --jq '.[] | select(.mergeable == "MERGEABLE") | .number')
 
                   if [ -z "$PRS" ]; then
                     echo "No mergeable pull requests found."
                     echo "mergeable_prs=" >> $GITHUB_OUTPUT
                   else
                     echo "Found mergeable PRs: $PRS"
-                    echo "mergeable_prs=$PRS" >> $GITHUB_OUTPUT
+                    # Convert newlines to commas for safe output handling
+                    PR_LIST=$(echo "$PRS" | tr '\n' ',' | sed 's/,$//')
+                    echo "mergeable_prs=$PR_LIST" >> $GITHUB_OUTPUT
                   fi
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -38,10 +39,11 @@ jobs:
               if: steps.get-prs.outputs.mergeable_prs != ''
               run: |
                   echo "Merging pull requests..."
-                  PRS="${{ steps.get-prs.outputs.mergeable_prs }}"
+                  PR_LIST="${{ steps.get-prs.outputs.mergeable_prs }}"
 
-                  # Convert to array and iterate
-                  echo "$PRS" | tr ' ' '\n' | while read pr_number; do
+                  # Convert comma-separated list back to array and iterate
+                  IFS=',' read -ra PR_ARRAY <<< "$PR_LIST"
+                  for pr_number in "${PR_ARRAY[@]}"; do
                     if [ -n "$pr_number" ]; then
                       echo "Merging PR #$pr_number"
                       gh pr merge "$pr_number" --merge --delete-branch
