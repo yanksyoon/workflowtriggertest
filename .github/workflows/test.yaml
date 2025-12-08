@@ -35,7 +35,7 @@ on:
   workflow_call:
   workflow_dispatch:
   workflow_run:
-    workflows: [Multi-Event Workflow Trigger Test]
+    workflows: [Hello World Workflow]
     types:
       - completed
 
