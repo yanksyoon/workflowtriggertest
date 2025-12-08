@@ -35,6 +35,9 @@ on:
   workflow_call:
   workflow_dispatch:
   workflow_run:
+    workflows: [Multi-Event Workflow Trigger Test]
+    types:
+      - completed
 
 jobs:
   capture-event-data:
