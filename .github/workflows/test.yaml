@@ -1,64 +1,22 @@
-name: Multi-Event Workflow Trigger Test
+name: End-to-End tests
 
 on:
-  branch_protection_rule:
-  check_run:
-  check_suite:
-  create:
-  delete:
-  deployment:
-  deployment_status:
-  discussion:
-  discussion_comment:
-  fork:
-  gollum:
-  image_version:
   issue_comment:
-  issues:
-  label:
-  merge_group:
-  milestone:
-  page_build:
-  public:
-  pull_request:
-  pull_request_review:
-  pull_request_review_comment:
-  pull_request_target:
-  push:
-  registry_package:
-  release:
-  repository_dispatch:
-  schedule:
-    - cron: "0 0 * * *" # Daily at midnight UTC
-  status:
-  watch:
-  workflow_call:
-  workflow_dispatch:
-  workflow_run:
-    workflows: [Hello World Workflow]
-    types:
-      - completed
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  capture-event-data:
-    runs-on: [self-hosted, linux, ARM64]
-
+  check_comment:
+    name: Check comment trigger
+    runs-on: ubuntu-latest
+    if: github.event.issue.pull_request && contains(github.event.comment.body, 'ci: run e2e')
+    outputs:
+      triggered: ${{ steps.check.outputs.triggered }}
     steps:
-      - name: Capture GitHub Event Data
+      - name: Check comment
+        id: check
         run: |
-          echo "Event Name: ${{ github.event_name }}"
-          echo "Event Path: ${{ github.event_path }}"
-
-          # Create directory if it doesn't exist
-          sudo mkdir -p /home/ubuntu
-
-          # Copy the event payload to the target location
-          sudo cp "${{ github.event_path }}" "/home/ubuntu/${{ github.event_name }}.json"
-
-          # Verify the file was created and show its contents
-          echo "File created: /home/ubuntu/${{ github.event_name }}.json"
-          echo "File contents:"
-          sudo cat "/home/ubuntu/${{ github.event_name }}.json"
-
-          # Also show file size and permissions for verification
-          sudo ls -la "/home/ubuntu/${{ github.event_name }}.json"
+          echo "triggered=true" >> $GITHUB_OUTPUT
