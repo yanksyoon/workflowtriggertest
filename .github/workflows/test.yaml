@@ -9,6 +9,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  echo_hello:
+    name: Echo Hello
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Hello
+        run: echo "Hello!"
   check_comment:
     name: Check comment trigger
     runs-on: ubuntu-latest
