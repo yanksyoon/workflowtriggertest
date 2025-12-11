@@ -8,7 +8,7 @@ locals {
   beta_charm_revision = 455
   beta_charm_channel  = "latest/edge"
   # renovate: depName="github-runner"
-  edge_charm_revision                  = 461
+  edge_charm_revision                  = 463
   edge_charm_channel                   = "latest/edge"
   github_runner_path                   = "canonical"
   github_runner_group                  = "Canonical self-hosted runners"
