@@ -15,11 +15,8 @@ jobs:
       matrix:
         flavor:
           - [hello, world]
-      name: Echo Hello
-      steps:
-        - name: apt-get
-          if: always()
-        - name: Print env
-          run: env
-        - name: Print event
-          run: cat "$GITHUB_EVENT_PATH"
+    steps:
+      - name: Print env
+        run: env
+      - name: Print event
+        run: cat "$GITHUB_EVENT_PATH"
