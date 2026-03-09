@@ -10,9 +10,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  runs-on: "${{ matrix.flavor }}"
   echo_hello:
     name: Echo Hello
-    runs-on: invalid-label
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor:
+          - hello,world
     steps:
-      - name: Print Hello
-        run: echo "Hello!"
+      - name: apt-get
+        if: always()
+        run: |
+          for i in {1..10}; do sudo apt-get update; done
+          sudo apt-get install python3-venv llvm -y
