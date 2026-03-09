@@ -9,13 +9,13 @@ concurrency:
 
 jobs:
   runs-on: "${{ matrix.flavor }}"
+  strategy:
+    fail-fast: false
+    matrix:
+      flavor:
+        - [hello, world]
   echo_hello:
     name: Echo Hello
-    strategy:
-      fail-fast: false
-      matrix:
-        flavor:
-          - [hello, world]
     steps:
       - name: apt-get
         if: always()
