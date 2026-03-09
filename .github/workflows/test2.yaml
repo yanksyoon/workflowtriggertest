@@ -1,8 +1,6 @@
 name: E2E
 
 on:
-  issue_comment:
-    types: [created]
   push:
 
 concurrency:
@@ -21,6 +19,7 @@ jobs:
     steps:
       - name: apt-get
         if: always()
-        run: |
-          for i in {1..10}; do sudo apt-get update; done
-          sudo apt-get install python3-venv llvm -y
+      - name: Print env
+        run: env
+      - name: Print event
+        run: cat "$GITHUB_EVENT_PATH"
