@@ -10,7 +10,7 @@ concurrency:
 jobs:
   echo_hello:
     name: Echo Hello
-    runs-on: invalid-label
+    runs-on: self-hosted 
     steps:
       - name: Print Hello
         run: echo "Hello!"
