@@ -16,4 +16,6 @@ jobs:
         run: echo "Hello!"
       - name: Print env
         run: env
+      - name: Print event
+        run: cat "$GITHUB_EVENT_PATH"
 
