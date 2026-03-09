@@ -8,18 +8,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  runs-on: "${{ matrix.flavor }}"
-  strategy:
-    fail-fast: false
-    matrix:
-      flavor:
-        - [hello, world]
   echo_hello:
-    name: Echo Hello
-    steps:
-      - name: apt-get
-        if: always()
-      - name: Print env
-        run: env
-      - name: Print event
-        run: cat "$GITHUB_EVENT_PATH"
+    runs-on: "${{ matrix.flavor }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor:
+          - [hello, world]
+      name: Echo Hello
+      steps:
+        - name: apt-get
+          if: always()
+        - name: Print env
+          run: env
+        - name: Print event
+          run: cat "$GITHUB_EVENT_PATH"
