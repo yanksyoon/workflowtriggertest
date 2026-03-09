@@ -1,8 +1,6 @@
 name: E2E
 
 on:
-  issue_comment:
-    types: [created]
   push:
 
 concurrency:
@@ -16,3 +14,6 @@ jobs:
     steps:
       - name: Print Hello
         run: echo "Hello!"
+      - name: Print env
+        run: env
+
