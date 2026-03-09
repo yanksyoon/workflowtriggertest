@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         flavor:
-          - hello,world
+          - [hello, world]
     steps:
       - name: apt-get
         if: always()
